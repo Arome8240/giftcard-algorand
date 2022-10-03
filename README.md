@@ -1,4 +1,4 @@
-Gift Card is a simple dapp that enables user of the platform to gift specific cards but with a twist😅. Users can choose to buy a card that wasnt gifted to them but at 3x the price. This is to ensure competitiveness of the platform. Users are also required to pay a token to the admin before they create the giftcard.
+Gift Card is a simple dapp that enables user of the platform to gift specific cards but with a twist😅. Users can choose to buy a card but when a card is bought it doubles its price to increase its value so users who choose to retain it have it more effective and if it is resold the user makes more money. This is to ensure competitiveness of the platform. 
 
 https://chipper-frangollo-387565.netlify.app
 
