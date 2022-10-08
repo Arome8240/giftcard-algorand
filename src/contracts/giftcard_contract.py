@@ -2,7 +2,7 @@ from pyteal import *
 
 class GiftCard:
     class Variables:
-        number = Bytes("NUMBER")
+        number = Bytes("NUMBER") # String variable representing the gift card's code
         description = Bytes("DESCRIPTION")
         image = Bytes("IMAGE")
         amount = Bytes("AMOUNT")
@@ -14,11 +14,21 @@ class GiftCard:
         buy = Bytes("buy")
         sell = Bytes("sell")
 
+    # allow users to create a new gift card application
     def application_creation(self):
         return Seq([
-            Assert(Txn.application_args.length() == Int(5)),
-            Assert(Txn.note() == Bytes("giftcard:uv2")),
-             Assert(Btoi(Txn.application_args[3]) > Int(0)),
+            # checks if input data contains only valid/non-empty input data
+            Assert(
+                And(            
+                    Txn.application_args.length() == Int(5),
+                    Txn.note() == Bytes("giftcard:uv2"),
+                    Btoi(Txn.application_args[3]) > Int(0),
+                    Len(Txn.application_args[0]) > Int(0),
+                    Len(Txn.application_args[1]) > Int(0),
+                    Len(Txn.application_args[2]) > Int(0),
+                    Len(Txn.application_args[4]) > Int(0),
+                )
+            ),
             App.globalPut(self.Variables.number, Txn.application_args[0]),
             App.globalPut(self.Variables.description, Txn.application_args[1]),
             App.globalPut(self.Variables.image, Txn.application_args[2]),
@@ -28,14 +38,20 @@ class GiftCard:
             App.globalPut(self.Variables.owner, Txn.application_args[4]),
             Approve()
         ])
-
+    
+    # allow users to buy a gift card that hasn't been bought yet
     def buyCard(self):
         return Seq([
             Assert(
+                # checks if gift card is available
+                # checks if sender is not the gift card's seller/current owner
+                # checks if the new value for owner is not empty
                 And(
                     Global.group_size() == Int(2),
                     Txn.application_args.length() == Int(2),
-                    App.globalGet(self.Variables.bought) == Int(0)
+                    App.globalGet(self.Variables.bought) == Int(0),
+                    App.globalGet(self.Variables.address) != Txn.sender(),
+                    Len(Txn.application_args[1]) > Int(0),
                 ),
             ),
             Assert(
@@ -54,13 +70,17 @@ class GiftCard:
             App.globalPut(self.Variables.bought, Int(1)),
             Approve()
         ])
-
+    # allow gift cards' owners to sell their gift cards
     def sellGiftCard(self):
         Assert(
+            # checks if gift card is already bought
+            # checks if sender is the gift card's owner
             And(
                 Txn.application_args.length() == Int(2),
+                App.globalGet(self.Variables.bought) == Int(1),
                 App.globalGet(
-                    self.Variables.owner) == Txn.application_args[1]
+                    self.Variables.owner) == Txn.application_args[1],
+                App.globalGet(self.Variables.address) == Txn.sender(),
             ),
         )
 
