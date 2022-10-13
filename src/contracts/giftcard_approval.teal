@@ -26,8 +26,8 @@ main_l6:
 global GroupSize
 int 2
 ==
-txn NumAppArgs
-int 2
+txn GroupIndex
+int 0
 ==
 &&
 byte "BOUGHT"
@@ -35,12 +35,17 @@ app_global_get
 int 0
 ==
 &&
+byte "OWNER"
+app_global_get
+txn Sender
+!=
+&&
 assert
 gtxn 1 TypeEnum
 int pay
 ==
 gtxn 1 Receiver
-byte "ADDRESS"
+byte "OWNER"
 app_global_get
 ==
 &&
@@ -55,10 +60,7 @@ gtxn 0 Sender
 &&
 assert
 byte "OWNER"
-txna ApplicationArgs 1
-app_global_put
-byte "ADDRESS"
-gtxn 1 Sender
+txna Accounts 0
 app_global_put
 byte "AMOUNT"
 byte "AMOUNT"
@@ -78,17 +80,17 @@ global CreatorAddress
 return
 main_l8:
 txn NumAppArgs
-int 5
+int 4
 ==
-assert
 txn Note
-byte "giftcard:uv2"
+byte "giftcard:uv3"
 ==
-assert
+&&
 txna ApplicationArgs 3
 btoi
 int 0
 >
+&&
 assert
 byte "NUMBER"
 txna ApplicationArgs 0
@@ -106,11 +108,8 @@ app_global_put
 byte "BOUGHT"
 int 0
 app_global_put
-byte "ADDRESS"
-global CreatorAddress
-app_global_put
 byte "OWNER"
-txna ApplicationArgs 4
+txna Accounts 0
 app_global_put
 int 1
 return
