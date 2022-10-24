@@ -3,6 +3,7 @@ import { indexerClient, myAlgoConnect } from "./utils/constants";
 import { v4 as uuidv4 } from "uuid";
 import { stringToMicroAlgos, microAlgosToString } from './utils/conversions';
 import './App.css';
+import Cover from "./Cover";
 import { buyGiftCardAction, createGiftCardAction, getgiftCardsAction, sellGiftCardAction } from './utils/marketplace';
 
 function App() {
@@ -83,9 +84,6 @@ function App() {
 
   };
 
-  useEffect(() => {
-    connectWallet()
-  }, [])
 
   const formHandler = (event) => {
     event.preventDefault();
@@ -94,7 +92,8 @@ function App() {
   };
 
   return (
-    <div>
+    <>
+    {address ? <div>
       <nav class="bg-white dark:bg-gray-800  shadow ">
         <div class="max-w-7xl mx-auto px-8">
           <div class="flex items-center justify-between h-16">
@@ -307,8 +306,8 @@ function App() {
           </div>
         </div>
       </form>
-    </div>
-  
+    </div> : <Cover name={"Gift Card"} coverImg={"https://images.unsplash.com/photo-1513885535751-8b9238bd345a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Z2lmdHN8ZW58MHx8MHx8&auto=format&fit=crop&w=600&q=60"} connect={connectWallet} />}
+    </>
   );
 }
 
