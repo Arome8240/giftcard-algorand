@@ -35,6 +35,16 @@ app_global_get
 int 0
 ==
 &&
+byte "ADDRESS"
+app_global_get
+txn Sender
+!=
+&&
+txna ApplicationArgs 1
+len
+int 0
+>
+&&
 assert
 gtxn 1 TypeEnum
 int pay
@@ -80,15 +90,35 @@ main_l8:
 txn NumAppArgs
 int 5
 ==
-assert
 txn Note
 byte "giftcard:uv2"
 ==
-assert
+&&
 txna ApplicationArgs 3
 btoi
 int 0
 >
+&&
+txna ApplicationArgs 0
+len
+int 0
+>
+&&
+txna ApplicationArgs 1
+len
+int 0
+>
+&&
+txna ApplicationArgs 2
+len
+int 0
+>
+&&
+txna ApplicationArgs 4
+len
+int 0
+>
+&&
 assert
 byte "NUMBER"
 txna ApplicationArgs 0
