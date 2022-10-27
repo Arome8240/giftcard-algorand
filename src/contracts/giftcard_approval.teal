@@ -2,32 +2,72 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l8
+bnz main_l16
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l7
+bnz main_l15
+txn OnCompletion
+int OptIn
+==
+bnz main_l14
+txna ApplicationArgs 0
+byte "activate"
+==
+bnz main_l13
 txna ApplicationArgs 0
 byte "buy"
 ==
-bnz main_l6
+bnz main_l12
+txna ApplicationArgs 0
+byte "buy"
+==
+bnz main_l9
 txna ApplicationArgs 0
 byte "sell"
 ==
-bnz main_l5
+bnz main_l8
 err
-main_l5:
+main_l8:
+byte "BOUGHT"
+app_global_get
+int 1
+==
+byte "OWNER"
+app_global_get
+txn Sender
+==
+&&
+assert
 byte "BOUGHT"
 int 0
 app_global_put
 int 1
 return
-main_l6:
+main_l9:
+txna Accounts 0
+txna Applications 0
+app_opted_in
 global GroupSize
 int 2
 ==
-txn NumAppArgs
-int 2
+&&
+txn GroupIndex
+int 0
+==
+&&
+txn NumAccounts
+int 1
+==
+&&
+txna Accounts 1
+byte "OWNER"
+app_global_get
+==
+&&
+byte "ACTIVATED"
+app_global_get
+int 1
 ==
 &&
 byte "BOUGHT"
@@ -35,12 +75,17 @@ app_global_get
 int 0
 ==
 &&
+byte "OWNER"
+app_global_get
+txn Sender
+!=
+&&
 assert
 gtxn 1 TypeEnum
 int pay
 ==
 gtxn 1 Receiver
-byte "ADDRESS"
+byte "OWNER"
 app_global_get
 ==
 &&
@@ -54,11 +99,26 @@ gtxn 0 Sender
 ==
 &&
 assert
+txna Accounts 1
+txna Applications 0
+byte "NUMBER"
+app_local_get_ex
+store 1
+store 0
+load 1
+bnz main_l11
+int 0
+return
+main_l11:
+txna Accounts 0
+byte "NUMBER"
+load 0
+app_local_put
+txna Accounts 1
+byte "NUMBER"
+app_local_del
 byte "OWNER"
-txna ApplicationArgs 1
-app_global_put
-byte "ADDRESS"
-gtxn 1 Sender
+txna Accounts 0
 app_global_put
 byte "AMOUNT"
 byte "AMOUNT"
@@ -71,46 +131,110 @@ int 1
 app_global_put
 int 1
 return
-main_l7:
+main_l12:
+txna Accounts 0
+txna Applications 0
+app_opted_in
+txn NumAccounts
+int 1
+==
+&&
+txna Accounts 1
+txna Applications 0
+app_opted_in
+&&
+byte "ACTIVATED"
+app_global_get
+int 1
+==
+&&
+txn Sender
+byte "OWNER"
+app_global_get
+==
+&&
+assert
+txna Accounts 1
+byte "NUMBER"
+txna Accounts 0
+byte "NUMBER"
+app_local_get
+app_local_put
+txna Accounts 0
+byte "NUMBER"
+app_local_del
+byte "OWNER"
+txna Accounts 1
+app_global_put
+int 1
+return
+main_l13:
+txna Accounts 0
+txna Applications 0
+app_opted_in
+txn NumAppArgs
+int 2
+==
+&&
+byte "ACTIVATED"
+app_global_get
+int 0
+==
+&&
+txn Sender
+global CreatorAddress
+==
+&&
+assert
+txna Accounts 0
+byte "NUMBER"
+txna ApplicationArgs 1
+app_local_put
+byte "ACTIVATED"
+int 1
+app_global_put
+int 1
+return
+main_l14:
+int 1
+return
+main_l15:
 txn Sender
 global CreatorAddress
 ==
 return
-main_l8:
+main_l16:
 txn NumAppArgs
-int 5
+int 3
 ==
-assert
 txn Note
-byte "giftcard:uv2"
+byte "giftcard:uv3"
 ==
-assert
+&&
 txna ApplicationArgs 3
 btoi
 int 0
 >
+&&
 assert
-byte "NUMBER"
+byte "DESCRIPTION"
 txna ApplicationArgs 0
 app_global_put
-byte "DESCRIPTION"
+byte "IMAGE"
 txna ApplicationArgs 1
 app_global_put
-byte "IMAGE"
-txna ApplicationArgs 2
-app_global_put
 byte "AMOUNT"
-txna ApplicationArgs 3
+txna ApplicationArgs 2
 btoi
+app_global_put
+byte "ACTIVATED"
+int 0
 app_global_put
 byte "BOUGHT"
 int 0
 app_global_put
-byte "ADDRESS"
-global CreatorAddress
-app_global_put
 byte "OWNER"
-txna ApplicationArgs 4
+txna Accounts 0
 app_global_put
 int 1
 return
